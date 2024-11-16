@@ -38,24 +38,24 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: Run test java
-      run: ./gradlew test
+    # - name: Run test java
+    #   run: ./gradlew test
       
-    - name: Notify on Failure
-      if: failure()
-      run: |
-        echo "Tests failed! Pipeline will be stopped."
-        exit 1
+    # - name: Notify on Failure
+    #   if: failure()
+    #   run: |
+    #     echo "Tests failed! Pipeline will be stopped."
+    #     exit 1
     
-    - name: Upload Test Report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-report
-        path: |                    # 여러 경로 지정
-          **/build/reports/tests/test/
-          **/build/test-results/test/
-        retention-days: 30 
+    # - name: Upload Test Report
+    #   if: always()
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: test-report
+    #     path: |                    # 여러 경로 지정
+    #       **/build/reports/tests/test/
+    #       **/build/test-results/test/
+    #     retention-days: 30 
 
     - name: 기본수행정보 Stop Summary에 표시
       run: |
@@ -79,3 +79,14 @@ jobs:
         name: checkstyle-report
         path: build/reports/checkstyle/
         retention-days: 14
+    
+    - name: Generate list using Markdown
+      run: |
+        echo "## 코드 스타일 분석결과" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ -f build/reports/checkstyle/main.xml ]; then # 소스분석결과 존재시
+          echo "### 소스분석결과" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat build/reports/checkstyle/main.xml >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi

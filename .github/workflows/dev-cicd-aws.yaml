@@ -39,3 +39,18 @@ jobs:
         distribution: 'temurin'
     - name: Run test java
       run: ./gradlew test
+    
+    - name: 테스트 실패시 파이프라인 중단
+      if: failure()
+      run: |
+        echo "Test failed! pipeline will stop"
+        exit 1
+    - name: 테스트 실패를 stop summary에 업로드
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report
+        path: |                    # 여러 경로 지정
+          **/build/reports/tests/test/
+          **/build/test-results/test/
+        retention-days: 30 

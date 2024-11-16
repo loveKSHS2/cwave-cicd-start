@@ -36,63 +36,63 @@ jobs:
           --health-retries=3
 
     steps:
-    # - name: 소스코드 다운로드
-    #   uses: actions/checkout@v4 
+    - name: 소스코드 다운로드
+      uses: actions/checkout@v4 
 
-    # - name: JDK 17 설치
-    #   uses: actions/setup-java@v4
-    #   with:
-    #     java-version: '17'
-    #     distribution: 'temurin'
+    - name: JDK 17 설치
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
         
-    # - name: change application.yml
-    #   run: |
-    #     cat > src/main/resources/application.yml << EOF
-    #     spring:
-    #       datasource:
-    #         url: ${{ secrets.DATABASE_URL }} # 예dbc:mysql://localhost:3306/istory
-    #         username: ${{ secrets.MYSQL_USER }}
-    #         password: ${{ secrets.MYSQL_PASSWORD }}
-    #         driver-class-name: com.mysql.cj.jdbc.Driver
-    #       jpa:
-    #         database-platform: org.hibernate.dialect.MySQL8Dialect
-    #         hibernate:
-    #           ddl-auto: update
-    #         show-sql: true
-    #       application:
-    #         name: USER-SERVICE
-    #       jwt:
-    #         issuer: user@gmail.com
-    #         secret_key: study-springboot
-    #     management:
-    #       endpoints:
-    #         web:
-    #           exposure:
-    #             include: health,info
-    #       endpoint:
-    #         health:
-    #           show-details: always
-    #     EOF
-    # - name: 테스트 수행
-    #   run: ./gradlew test
+    - name: change application.yml
+      run: |
+        cat > src/main/resources/application.yml << EOF
+        spring:
+          datasource:
+            url: ${{ secrets.DATABASE_URL }} # 예dbc:mysql://localhost:3306/istory
+            username: ${{ secrets.MYSQL_USER }}
+            password: ${{ secrets.MYSQL_PASSWORD }}
+            driver-class-name: com.mysql.cj.jdbc.Driver
+          jpa:
+            database-platform: org.hibernate.dialect.MySQL8Dialect
+            hibernate:
+              ddl-auto: update
+            show-sql: true
+          application:
+            name: USER-SERVICE
+          jwt:
+            issuer: user@gmail.com
+            secret_key: study-springboot
+        management:
+          endpoints:
+            web:
+              exposure:
+                include: health,info
+          endpoint:
+            health:
+              show-details: always
+        EOF
+    - name: 테스트 수행
+      run: ./gradlew test
 
-    # - name: 테스트 검사 후 실패 시 파이프라인 중단
-    #   if: failure()
-    #   run: |
-    #     echo "Tests failed! Pipeline will be stopped."
-    #     exit 1
+    - name: 테스트 검사 후 실패 시 파이프라인 중단
+      if: failure()
+      run: |
+        echo "Tests failed! Pipeline will be stopped."
+        exit 1
 
-    # - name: 테스트 결과를 STEP Summary 에 업로드
-    #   if: always()
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: test-report
-    #     path: |                    # 여러 경로 지정
-    #       **/build/reports/tests/test/
-    #       **/build/test-results/test/
-    #     retention-days: 30 
+    - name: 테스트 결과를 STEP Summary 에 업로드
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report
+        path: |                    # 여러 경로 지정
+          **/build/reports/tests/test/
+          **/build/test-results/test/
+        retention-days: 30 
 
-    - name: 기본수행정보 Step Summary 에 표시
+    - name: 기본 수행정보 Step Summary 에 표시
       run: |
         echo "## 워크플로우 실행 정보 요약" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
@@ -101,66 +101,65 @@ jobs:
         echo "* 실행 저장소: ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
         echo "* 실행 브랜치: ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
 
-    # - name: 코드 컨벤션 규칙 검사
-    #   run: |
-    #     mkdir -p build/reports/checkstyle
-    #     ./gradlew checkstyleMain checkstyleTest --info
-    #     ls -la build/reports/checkstyle || true 
+    - name: 코드 컨벤션 규칙 검사
+      run: |
+        mkdir -p build/reports/checkstyle
+        ./gradlew checkstyleMain checkstyleTest --info
+        ls -la build/reports/checkstyle || true 
 
-    # - name: 코드 컨벤션 검사 결과 업로드
-    #   if: always()
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: checkstyle-report
-    #     path: build/reports/checkstyle/
-    #     retention-days: 14
-    # - name: Generate list using Markdown
-    #   run: |
-    #     echo "## 코드 스타일 분석결과" >> $GITHUB_STEP_SUMMARY
-    #     echo "" >> $GITHUB_STEP_SUMMARY
-    #     if [ -f build/reports/checkstyle/main.xml ]; then # 소스분석결과 존재시
-    #       echo "### 소스분석결과" >> $GITHUB_STEP_SUMMARY
-    #       echo '```' >> $GITHUB_STEP_SUMMARY
-    #       cat build/reports/checkstyle/main.xml >> $GITHUB_STEP_SUMMARY
-    #       echo '```' >> $GITHUB_STEP_SUMMARY
-    #     fi
-    # - name: CodeQL 초기화
-    #   uses: github/codeql-action/init@v3
-    #   with:
-    #     languages: java
-    #     queries: security-and-quality
+    - name: 코드 컨벤션 검사 결과 업로드
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkstyle-report
+        path: build/reports/checkstyle/
+        retention-days: 14
+    - name: Generate list using Markdown
+      run: |
+        echo "## 코드 스타일 분석결과" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ -f build/reports/checkstyle/main.xml ]; then # 소스분석결과 존재시
+          echo "### 소스분석결과" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat build/reports/checkstyle/main.xml >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
+    - name: CodeQL 초기화
+      uses: github/codeql-action/init@v3
+      with:
+        languages: java
+        queries: security-and-quality
 
-    # - name: 코드 빌드
-    #   uses: github/codeql-action/autobuild@v3
+    - name: 코드 빌드
+      uses: github/codeql-action/autobuild@v3
 
-    # - name: 보안 취약점 분석
-    #   uses: github/codeql-action/analyze@v3
-    #   with:
-    #     category: "/language:java"
-    #     output: sarif-results
+    - name: 보안 취약점 분석
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:java"
+        output: sarif-results
 
-    # - name: 보안취약점 분석 요약
-    #   run: |
-    #     echo "# 파이프라인 리포트" >> $GITHUB_STEP_SUMMARY
-    #     echo "## 보안 경고" >> $GITHUB_STEP_SUMMARY
+    - name: 보안취약점 분석 요약
+      run: |
+        echo "# 파이프라인 리포트" >> $GITHUB_STEP_SUMMARY
+        echo "## 보안 경고" >> $GITHUB_STEP_SUMMARY
         
-    #     if [ -f sarif-results/java.sarif ]; then
-    #       if jq -e '.runs[0].results' sarif-results/java.sarif > /dev/null 2>&1; then
-    #         ALERTS=$(jq '.runs[].results | length' sarif-results/java.sarif)
-    #         echo "${ALERTS}개의 잠재적인 보안 이슈가 발견 되었습니다." >> $GITHUB_STEP_SUMMARY
+        if [ -f sarif-results/java.sarif ]; then
+          if jq -e '.runs[0].results' sarif-results/java.sarif > /dev/null 2>&1; then
+            ALERTS=$(jq '.runs[].results | length' sarif-results/java.sarif)
+            echo "${ALERTS}개의 잠재적인 보안 이슈가 발견 되었습니다." >> $GITHUB_STEP_SUMMARY
             
-    #         echo "### 보안 경고 상세" >> $GITHUB_STEP_SUMMARY
-    #         echo "| Severity | Rule | Description | File |" >> $GITHUB_STEP_SUMMARY
-    #         echo "|----------|------|-------------|------|" >> $GITHUB_STEP_SUMMARY
+            echo "### 보안 경고 상세" >> $GITHUB_STEP_SUMMARY
+            echo "| Severity | Rule | Description | File |" >> $GITHUB_STEP_SUMMARY
+            echo "|----------|------|-------------|------|" >> $GITHUB_STEP_SUMMARY
             
-    #         jq -r '.runs[].results[] | "| \(.properties.security_severity // "medium") | \(.ruleId // "N/A") | \(.message.text // "N/A") | \(.locations[0].physicalLocation.artifactLocation.uri):\(.locations[0].physicalLocation.region.startLine) |"' sarif-results/java.sarif >> $GITHUB_STEP_SUMMARY || true
-    #       else
-    #         echo "No results found in SARIF file." >> $GITHUB_STEP_SUMMARY
-    #       fi
-    #     else
-    #       echo "No SARIF results file found." >> $GITHUB_STEP_SUMMARY
-    #     fi
-  
+            jq -r '.runs[].results[] | "| \(.properties.security_severity // "medium") | \(.ruleId // "N/A") | \(.message.text // "N/A") | \(.locations[0].physicalLocation.artifactLocation.uri):\(.locations[0].physicalLocation.region.startLine) |"' sarif-results/java.sarif >> $GITHUB_STEP_SUMMARY || true
+          else
+            echo "No results found in SARIF file." >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "No SARIF results file found." >> $GITHUB_STEP_SUMMARY
+        fi
   load-test:
     runs-on: ubuntu-latest
     environment: runner
@@ -258,18 +257,17 @@ jobs:
       env:
         K6_VIRTUAL_USERS: 10
         K6_DURATION: "30s"
-        
+
+
   build-and-upload:
-    # needs: [verify-pipeline]  # 기존 검증 후 실행행행
+    # needs: [verify-pipeline] 
     runs-on: ubuntu-latest
-    #environment: ${{ github.ref == 'refs/heads/main' && 'prd' || 'dev' }}
     environment: dev
-    
     steps:
-      - name: Checkout source code
+      - name: 배포용 소스 다운로드
         uses: actions/checkout@v4
 
-      - name: change application.yml
+      - name: 개발용 application.yml 생성
         run: |
           cat > src/main/resources/application.yml << EOF
           spring:
@@ -297,14 +295,12 @@ jobs:
               health:
                 show-details: always
           EOF
-          
-      - name: Configure AWS credentials
+      - name: AWS 접속정보 설정
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2  # 서울 리전
-
+          aws-region: ap-northeast-2  # 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -315,7 +311,7 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew bootJar
-      
+          
       - name: Generate artifact name with timestamp
         run: |
           echo "ARTIFACT_NAME=springboot-$(date +'%Y%m%d-%H%M%S').jar" >> $GITHUB_ENV
@@ -328,14 +324,14 @@ jobs:
           cp -r scripts deployment/
           cd deployment && zip -r ../deploy.zip .          
 
-      - name: Upload to S3
+      - name: S3 업로드
         run: |
           # JAR 파일 업로드
           aws s3 cp deployment/${{ env.ARTIFACT_NAME }} s3://${{ secrets.AWS_S3_BUCKET }}/artifacts/
           # 배포 패키지 업로드
           aws s3 cp deploy.zip s3://${{ secrets.AWS_S3_BUCKET }}/deploy/deploy.zip
-          
-      - name: Generate deployment summary
+      
+      - name: 배포 기본정보 표시
         run: |
           echo "## 📦 배포 정보" >> $GITHUB_STEP_SUMMARY
           echo "| 항목 | 내용 |" >> $GITHUB_STEP_SUMMARY
@@ -343,7 +339,7 @@ jobs:
           echo "| 🎯 버킷 | \`${{ secrets.AWS_S3_BUCKET }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| 📄 파일명 | \`${{ env.ARTIFACT_NAME }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| 🕒 배포 시각 | $(date) |" >> $GITHUB_STEP_SUMMARY
-      - name: Check and stop existing deployments
+      - name: 기존 진행중인 배포 삭제
         run: |
           DEPLOYMENTS=$(aws deploy list-deployments \
             --application-name istory-app \
@@ -360,7 +356,7 @@ jobs:
             # 잠시 대기하여 취소가 완료되도록 함
             sleep 10
           fi
-      - name: Deploy to EC2 via CodeDeploy
+      - name: EC2 배포 수행
         id: deploy
         run: |
           DEPLOYMENT_ID=$(aws deploy create-deployment \
@@ -371,6 +367,6 @@ jobs:
             --query 'deploymentId')
           echo "deployment_id=${DEPLOYMENT_ID}" >> $GITHUB_OUTPUT
 
-      - name: Wait for deployment to complete
+      - name: 배포 최종 성공 확인
         run: |
           aws deploy wait deployment-successful --deployment-id ${{ steps.deploy.outputs.deployment_id }}

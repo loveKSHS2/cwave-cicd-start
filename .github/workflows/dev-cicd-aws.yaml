@@ -46,3 +46,22 @@ jobs:
       run: |
         echo "Tests failed! Pipeline will be stopped."
         exit 1
+    
+    - name: Upload Test Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report
+        path: |                    # 여러 경로 지정
+          **/build/reports/tests/test/
+          **/build/test-results/test/
+        retention-days: 30 
+
+    - name: 기본수행정보 Stop Summary에 표시
+      run: |
+        echo "## 워크플로우 실행 정보 요약" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "* 실행 담당자: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "* 실행 이벤트: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "* 실행 저장소: ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+        echo "* 실행 브랜치: ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY

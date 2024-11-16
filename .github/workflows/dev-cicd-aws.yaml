@@ -161,7 +161,7 @@ jobs:
     #       echo "No SARIF results file found." >> $GITHUB_STEP_SUMMARY
     #     fi
   build-and-upload:
-    # needs: [verify-pipeline]  # 기존 검증 후 실행
+    # needs: [verify-pipeline]  # 기존 검증 후 실행행행
     runs-on: ubuntu-latest
     #environment: ${{ github.ref == 'refs/heads/main' && 'prd' || 'dev' }}
     environment: dev
